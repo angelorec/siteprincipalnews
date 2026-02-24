@@ -1,0 +1,43 @@
+[
+  {
+    "id": "monthly",
+    "title": "Mensal",
+    "price": 1990,
+    "period": "mensal",
+    "description": "Acesso mensal a todo conteúdo exclusivo",
+    "features": ["Fotos exclusivas", "Vídeos em HD", "Chat direto", "Atualizações diárias"]
+  },
+  {
+    "id": "quarterly",
+    "title": "Trimestral",
+    "price": 3990,
+    "period": "trimestral",
+    "originalPrice": 5970,
+    "discount": "33% OFF",
+    "description": "3 meses com desconto especial",
+    "features": [
+      "Todas as fotos e vídeos",
+      "Conteúdo em 4K",
+      "Chat prioritário",
+      "Lives exclusivas",
+      "Economia de 33%"
+    ],
+    "popular": true
+  },
+  {
+    "id": "semester",
+    "title": "Semestral",
+    "price": 5990,
+    "period": "semestral",
+    "originalPrice": 11940,
+    "discount": "50% OFF",
+    "description": "6 meses com máximo desconto",
+    "features": [
+      "Todo conteúdo Premium",
+      "Conteúdo personalizado",
+      "Acesso prioritário",
+      "Lives exclusivas",
+      "Economia de 50%"
+    ]
+  }
+]

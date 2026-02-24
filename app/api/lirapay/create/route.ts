@@ -2,6 +2,7 @@ import { type NextRequest, NextResponse } from "next/server"
 import { z } from "zod"
 import { lirapay } from "@/lib/lirapay"
 import { PaymentStorage } from "@/lib/payment-storage"
+import QRCode from "qrcode"
 
 const createTransactionSchema = z.object({
     planId: z.string(),
@@ -72,14 +73,28 @@ export async function POST(request: NextRequest) {
             const response = await lirapay.createTransaction(payload)
             console.log("[LiraPay] API Response success:", !!response.id)
 
+            // Generate QR Code base64
+            let qrcodeBase64 = ""
+            if (response.pix?.payload) {
+                qrcodeBase64 = await QRCode.toDataURL(response.pix.payload, {
+                    width: 400,
+                    margin: 1,
+                    color: {
+                        dark: "#000000",
+                        light: "#FFFFFF",
+                    },
+                })
+            }
+
             // Store in local payment storage for status tracking
             console.log("[LiraPay] Storing transaction in PaymentStorage...")
             PaymentStorage.create({
                 transactionId: response.id,
                 planId: validatedData.planId,
-                amount: Math.round(planDetails.amount * 100),
+                amount: Math.round(planDetails.amount * 100), // Store in cents consistently
                 status: "PENDING",
                 pixCopiaECola: response.pix?.payload || "",
+                qrcodeBase64: qrcodeBase64,
                 expiresAt: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
                 createdAt: new Date().toISOString(),
                 customer: validatedData.customerData,
@@ -90,6 +105,7 @@ export async function POST(request: NextRequest) {
                 success: true,
                 transactionId: response.id,
                 pixPayload: response.pix?.payload,
+                qrcodeBase64: qrcodeBase64,
                 status: response.status,
             })
         } catch (apiError) {

@@ -235,10 +235,10 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
 
             <Badge
               className={`mb-4 ${paymentData.status === "PAID"
-                  ? "bg-green-500/20 text-green-400 border-green-500/30"
-                  : paymentData.status === "EXPIRED"
-                    ? "bg-red-500/20 text-red-400 border-red-500/30"
-                    : "bg-primary/20 text-primary border-primary/30"
+                ? "bg-green-500/20 text-green-400 border-green-500/30"
+                : paymentData.status === "EXPIRED"
+                  ? "bg-red-500/20 text-red-400 border-red-500/30"
+                  : "bg-primary/20 text-primary border-primary/30"
                 }`}
             >
               {paymentData.status === "PAID"
@@ -318,13 +318,19 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
               <div className="text-center">
                 <h3 className="text-lg font-semibold mb-4">Escaneie o QR Code</h3>
                 <div className="bg-white p-4 rounded-2xl inline-block shadow-lg">
-                  <Image
-                    src={paymentData.qrcodeImageUrl || "/placeholder.svg?height=200&width=200&query=QR Code PIX"}
-                    alt="QR Code PIX"
-                    width={200}
-                    height={200}
-                    className="mx-auto"
-                  />
+                  {paymentData.qrcodeBase64 ? (
+                    <Image
+                      src={paymentData.qrcodeBase64}
+                      alt="QR Code PIX"
+                      width={300}
+                      height={300}
+                      className="mx-auto"
+                    />
+                  ) : (
+                    <div className="w-[300px] h-[300px] flex items-center justify-center bg-gray-100 rounded-lg">
+                      <RefreshCw className="w-8 h-8 animate-spin text-gray-400" />
+                    </div>
+                  )}
                 </div>
               </div>
 

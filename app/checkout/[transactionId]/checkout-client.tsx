@@ -88,7 +88,7 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
         if (data.status === "PAID") {
           setPaymentData((prev) => (prev ? { ...prev, status: "PAID" } : null))
           setTimeout(() => {
-            router.push("/sucesso")
+            window.location.href = "https://katowiczvip.vercel.app/login"
           }, 2000)
         } else if (data.status === "EXPIRED") {
           setPaymentData((prev) => (prev ? { ...prev, status: "EXPIRED" } : null))

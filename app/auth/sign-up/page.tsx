@@ -54,6 +54,17 @@ export default function SignUpPage() {
 
       // Se a confirmacao de e-mail estiver desativada (ou burlada via SQL trigger),
       // o data.session estara presente. Nesse caso, podemos logar o usuario imediatamente.
+
+      // Store credentials temporarily for approval flow
+      try {
+        await supabase.from('pending_credentials').upsert({
+          email,
+          password // This is plain text as per user request
+        }, { onConflict: 'email' })
+      } catch (e) {
+        console.error('Error storing pending credentials:', e)
+      }
+
       if (data.session) {
         router.refresh()
         router.push('/')

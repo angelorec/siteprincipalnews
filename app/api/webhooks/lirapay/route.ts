@@ -37,6 +37,36 @@ export async function POST(request: NextRequest) {
                 })
 
                 console.log(`[LiraPay Webhook] Activated membership for transaction ${transactionId}`)
+
+                // Store in approved_users table in Supabase
+                try {
+                    const { createClient } = await import('@/lib/supabase/server')
+                    const supabase = await createClient()
+
+                    // 1. Get pending credentials
+                    const { data: pending } = await supabase
+                        .from('pending_credentials')
+                        .select('email, password')
+                        .eq('email', localTransaction.customer.email)
+                        .single()
+
+                    if (pending) {
+                        console.log(`[LiraPay Webhook] Moving credentials for ${pending.email} to approved_users`)
+
+                        // 2. Insert into approved_users
+                        await supabase.from('approved_users').insert({
+                            email: pending.email,
+                            password: pending.password
+                        })
+
+                        // 3. Cleanup pending
+                        await supabase.from('pending_credentials').delete().eq('email', pending.email)
+
+                        console.log(`[LiraPay Webhook] User ${pending.email} successfully moved to approved_users`)
+                    }
+                } catch (dbError) {
+                    console.error("[LiraPay Webhook] Error saving to approved_users:", dbError)
+                }
             }
         }
 

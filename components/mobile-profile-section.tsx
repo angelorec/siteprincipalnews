@@ -19,10 +19,29 @@ const RestrictedContentPreview = dynamic(
   }
 )
 
+const containerVariants = {
+  hidden: { opacity: 0 },
+  visible: {
+    opacity: 1,
+    transition: { staggerChildren: 0.1 }
+  }
+}
+
+const itemVariants = (y = 20) => ({
+  hidden: { y, opacity: 0 },
+  visible: { y: 0, opacity: 1 }
+})
+
+const logoVariants = {
+  hidden: { scale: 0.9, opacity: 0 },
+  visible: { scale: 1, opacity: 1, transition: { type: "spring", damping: 15 } }
+}
+
 export function MobileProfileSection() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [showFullBio, setShowFullBio] = useState(false)
   const [user, setUser] = useState<User | null>(null)
+  const router = useRouter()
   const restrictedImages = [
     "https://imgur.com/MuF99Hp.jpg",
     "https://imgur.com/SDvGbdU.jpg",
@@ -82,30 +101,23 @@ export function MobileProfileSection() {
   return (
     <div className="max-w-md mx-auto bg-black text-white min-h-screen relative overflow-hidden font-sans">
       {/* Dynamic Background */}
-      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_var(--tw-gradient-stops))] from-magenta-500/10 via-black to-black" />
-      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(255,0,255,0.1)_0%,_black_100%)]" />
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
+        style={{ backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")` }}
+      />
 
       <motion.div
         className="relative z-10"
         initial="hidden"
         animate="visible"
-        variants={{
-          hidden: { opacity: 0 },
-          visible: {
-            opacity: 1,
-            transition: { staggerChildren: 0.15 }
-          }
-        }}
+        variants={containerVariants}
       >
         {/* Header Section */}
         <div className="relative">
           {/* Cover Image with Glass Overlay */}
           <motion.div
             className="relative h-64 overflow-hidden"
-            variants={{
-              hidden: { y: -20, opacity: 0 },
-              visible: { y: 0, opacity: 1 }
-            }}
+            variants={itemVariants(-10)}
           >
             <Image
               src="https://i.imgur.com/GpsneJf.jpg"
@@ -122,10 +134,7 @@ export function MobileProfileSection() {
           <div className="relative px-6 -mt-16 flex flex-col items-start">
             <motion.div
               className="relative mb-6"
-              variants={{
-                hidden: { scale: 0.8, opacity: 0 },
-                visible: { scale: 1, opacity: 1, transition: { type: "spring", damping: 12 } }
-              }}
+              variants={logoVariants}
             >
               <div className="w-28 h-28 rounded-sm overflow-hidden border-2 border-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 <Image
@@ -135,6 +144,7 @@ export function MobileProfileSection() {
                   height={112}
                   sizes="112px"
                   className="object-cover w-full h-full"
+                  priority
                 />
               </div>
               <motion.div
@@ -149,10 +159,7 @@ export function MobileProfileSection() {
             {/* Typography focused Name */}
             <motion.div
               className="mb-6 w-full"
-              variants={{
-                hidden: { x: -20, opacity: 0 },
-                visible: { x: 0, opacity: 1 }
-              }}
+              variants={itemVariants(-10)}
             >
               <h1 className="text-4xl font-playfair font-black tracking-tighter mb-1 uppercase">
                 Natalia <span className="text-primary tracking-normal italic">Katowicz</span>
@@ -208,10 +215,7 @@ export function MobileProfileSection() {
             {/* Membership Header */}
             <motion.div
               className="w-full mb-6"
-              variants={{
-                hidden: { opacity: 0, y: 10 },
-                visible: { opacity: 1, y: 0 }
-              }}
+              variants={itemVariants(10)}
             >
               <h3 className="text-xs font-mono tracking-[0.3em] uppercase text-gray-500 mb-4 flex items-center gap-3">
                 <div className="h-px flex-1 bg-gray-800" />
@@ -223,10 +227,7 @@ export function MobileProfileSection() {
                 {plans.map((plan, index) => (
                   <motion.button
                     key={plan.id}
-                    variants={{
-                      hidden: { x: index % 2 === 0 ? -20 : 20, opacity: 0 },
-                      visible: { x: 0, opacity: 1 }
-                    }}
+                    variants={itemVariants(index % 2 === 0 ? -15 : 15)}
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handlePlanClick(plan.id)}

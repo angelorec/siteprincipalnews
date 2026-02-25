@@ -108,7 +108,7 @@ export function MobileProfileSection() {
               visible: { y: 0, opacity: 1 }
             }}
           >
-            <Image src="https://i.imgur.com/c3GOCr8.jpg" alt="Cover" fill className="object-cover scale-105" priority />
+            <Image src="https://i.imgur.com/GpsneJf.jpg" alt="Cover" fill className="object-cover scale-105" priority />
             <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
           </motion.div>
 
@@ -123,7 +123,7 @@ export function MobileProfileSection() {
             >
               <div className="w-28 h-28 rounded-sm overflow-hidden border-2 border-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
                 <Image
-                  src="https://i.imgur.com/JFb3R8k.jpg"
+                  src="https://i.imgur.com/hTDWL8R.png"
                   alt="Natalia Katowicz"
                   width={112}
                   height={112}

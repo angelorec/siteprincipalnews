@@ -8,7 +8,7 @@ export function HeroSection() {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <Image src="/elegant-purple-and-pink-gradient-background-for-ad.png" alt="Natália Katowicz Cover" fill className="object-cover" priority />
+        <Image src="https://i.imgur.com/GpsneJf.jpg" alt="Natália Katowicz Cover" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/60 to-background/40" />
       </div>
 
@@ -29,7 +29,7 @@ export function HeroSection() {
           >
             <div className="relative w-40 h-40 mx-auto mb-6">
               <Image
-                src="/professional-portrait-of-beautiful-woman-with-dark.png"
+                src="https://i.imgur.com/hTDWL8R.png"
                 alt="Natália Katowicz"
                 fill
                 className="object-cover rounded-full border-4 border-primary/50 shadow-2xl glass"

@@ -1,6 +1,6 @@
 "use client"
 
-import { motion } from "framer-motion"
+import { motion, AnimatePresence } from "framer-motion"
 import Image from "next/image"
 import { useState, useEffect } from "react"
 import { Badge } from "@/components/ui/badge"
@@ -14,7 +14,22 @@ export function MobileProfileSection() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [showFullBio, setShowFullBio] = useState(false)
   const [user, setUser] = useState<User | null>(null)
+  const [currentImageIndex, setCurrentImageIndex] = useState(0)
   const router = useRouter()
+
+  const restrictedImages = [
+    "https://imgur.com/MuF99Hp.jpg",
+    "https://imgur.com/SDvGbdU.jpg",
+    "https://imgur.com/Ts4JRg2.jpg",
+    "https://imgur.com/77XFQg4.jpg"
+  ]
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCurrentImageIndex((prev) => (prev + 1) % restrictedImages.length)
+    }, 3000)
+    return () => clearInterval(interval)
+  }, [restrictedImages.length])
 
   useEffect(() => {
     const supabase = createClient()
@@ -244,15 +259,26 @@ export function MobileProfileSection() {
                 visible: { opacity: 1, scale: 1 }
               }}
             >
-              <div className="relative aspect-square w-full filter saturate-[0.2] hover:saturate-100 transition-all duration-700">
-                <Image
-                  src="https://i.imgur.com/II3RtV9.jpg"
-                  alt="Exclusive Preview"
-                  fill
-                  className="object-cover blur-[2px]"
-                />
+              <div className="relative aspect-square w-full filter saturate-[0.2] hover:saturate-100 transition-all duration-700 overflow-hidden">
+                <AnimatePresence mode="wait">
+                  <motion.div
+                    key={currentImageIndex}
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    exit={{ opacity: 0 }}
+                    transition={{ duration: 1 }}
+                    className="absolute inset-0"
+                  >
+                    <Image
+                      src={restrictedImages[currentImageIndex]}
+                      alt="Exclusive Preview"
+                      fill
+                      className="object-cover blur-[8px]"
+                    />
+                  </motion.div>
+                </AnimatePresence>
                 <div className="absolute inset-0 bg-black/40 mix-blend-multiply" />
-                <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black to-transparent">
+                <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black to-transparent z-20">
                   <div className="flex items-center gap-4">
                     <div className="w-12 h-px bg-primary" />
                     <Lock className="w-8 h-8 text-white" />

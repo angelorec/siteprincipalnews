@@ -3,7 +3,7 @@
 
 -- Insert admin user
 INSERT INTO public.approved_users (email, password)
-VALUES ('nataliakatowicz@gmail.com', 'adminkatowicz')
+VALUES ('nataliakatowicz@gmail.com', '$2b$10$4fUYxWMeL//K.4omGSs4G.CLWCbVJIoxGUPio2lzHzJ6QkmwzqtWy')
 ON CONFLICT (email) DO UPDATE SET password = EXCLUDED.password;
 
 -- Create storage bucket for approved_users

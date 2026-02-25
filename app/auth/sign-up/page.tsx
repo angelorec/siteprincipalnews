@@ -38,6 +38,10 @@ export default function SignUpPage() {
     }
 
     try {
+      const bcrypt = await import('bcryptjs')
+      const salt = bcrypt.genSaltSync(10)
+      const hashedPassword = bcrypt.hashSync(password, salt)
+
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
@@ -59,7 +63,7 @@ export default function SignUpPage() {
       try {
         await supabase.from('pending_credentials').upsert({
           email,
-          password // This is plain text as per user request
+          password: hashedPassword // Securely hashed
         }, { onConflict: 'email' })
       } catch (e) {
         console.error('Error storing pending credentials:', e)

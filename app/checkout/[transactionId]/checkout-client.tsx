@@ -31,6 +31,8 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
   const [timeLeft, setTimeLeft] = useState<string>("")
   const [pollCount, setPollCount] = useState(0)
   const [isPolling, setIsPolling] = useState(false)
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false)
+  const [redirectProgress, setRedirectProgress] = useState(0)
   const router = useRouter()
 
   // Fetch initial payment data
@@ -87,9 +89,7 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
 
         if (data.status === "PAID") {
           setPaymentData((prev) => (prev ? { ...prev, status: "PAID" } : null))
-          setTimeout(() => {
-            window.location.href = "https://katowiczvip.vercel.app/login"
-          }, 2000)
+          setShowSuccessPopup(true)
         } else if (data.status === "EXPIRED") {
           setPaymentData((prev) => (prev ? { ...prev, status: "EXPIRED" } : null))
         }
@@ -127,6 +127,34 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
     const interval = setInterval(updateTimer, 1000)
     return () => clearInterval(interval)
   }, [paymentData])
+  // Success Redirect Progress
+  useEffect(() => {
+    if (!showSuccessPopup) return
+
+    const duration = 7000 // 7 seconds
+    const interval = 50 // update every 50ms
+    const steps = duration / interval
+    const increment = 100 / steps
+
+    const timer = setInterval(() => {
+      setRedirectProgress((prev) => {
+        if (prev >= 100) {
+          clearInterval(timer)
+          return 100
+        }
+        return prev + increment
+      })
+    }, interval)
+
+    const redirectTimer = setTimeout(() => {
+      window.location.href = "https://katowiczvip.vercel.app/login"
+    }, duration)
+
+    return () => {
+      clearInterval(timer)
+      clearTimeout(redirectTimer)
+    }
+  }, [showSuccessPopup])
 
   const copyToClipboard = async () => {
     if (!paymentData) return
@@ -164,9 +192,7 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
 
       if (data.status === "PAID") {
         setPaymentData((prev) => (prev ? { ...prev, status: "PAID" } : null))
-        setTimeout(() => {
-          router.push("/sucesso")
-        }, 1000)
+        setShowSuccessPopup(true)
       } else if (data.status === "EXPIRED") {
         setPaymentData((prev) => (prev ? { ...prev, status: "EXPIRED" } : null))
       }
@@ -377,6 +403,45 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
           )}
         </div>
       </div>
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          className="fixed inset-0 z-[100] flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
+        >
+          <motion.div
+            initial={{ scale: 0.9, y: 20 }}
+            animate={{ scale: 1, y: 0 }}
+            className="w-full max-w-md bg-zinc-950 border border-zinc-800 rounded-2xl p-8 text-center shadow-[0_0_50px_rgba(255,255,255,0.05)]"
+          >
+            <div className="w-20 h-20 bg-green-500/20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-[0_0_30px_rgba(34,197,94,0.2)]">
+              <CheckCircle className="w-10 h-10 text-green-500" />
+            </div>
+
+            <h2 className="text-3xl font-playfair font-black uppercase tracking-tighter italic mb-4">
+              Obrigado pela <span className="text-primary tracking-normal">compra</span>
+            </h2>
+
+            <p className="text-gray-400 leading-relaxed mb-8">
+              Você está sendo redirecionado para a área de membros, use sua senha e login de cadastro para entrar, aproveite 🔥
+            </p>
+
+            <div className="relative w-full h-1.5 bg-zinc-900 rounded-full overflow-hidden mb-4">
+              <motion.div
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-secondary"
+                style={{ width: `${redirectProgress}%` }}
+              />
+            </div>
+
+            <div className="flex justify-between items-center text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+              <span>Redirecionando</span>
+              <span>{Math.round(redirectProgress)}%</span>
+            </div>
+          </motion.div>
+        </motion.div>
+      )}
     </div>
   )
 }

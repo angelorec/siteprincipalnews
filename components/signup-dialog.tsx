@@ -93,58 +93,60 @@ export function SignupDialog({ isOpen, onClose, selectedPlan, user }: SignupDial
           exit={{ opacity: 0 }}
         >
           <motion.div
-            initial={{ scale: 0.9, opacity: 0, y: 20 }}
+            initial={{ scale: 0.95, opacity: 0, y: 10 }}
             animate={{ scale: 1, opacity: 1, y: 0 }}
-            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-            transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="w-full max-w-md bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-6 text-white border border-purple-500/30 shadow-2xl overflow-y-auto max-h-[90vh]"
+            exit={{ scale: 0.95, opacity: 0, y: 10 }}
+            transition={{ type: "spring", damping: 30, stiffness: 400 }}
+            className="w-full max-w-md bg-black rounded-sm p-8 text-white border-2 border-white/90 shadow-[0_0_40px_rgba(255,255,255,0.1)] overflow-y-auto max-h-[90vh] relative"
           >
-            <div className="flex items-center justify-between mb-6 pb-4 border-b border-gray-700/50">
-              <h2 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Finalizar Assinatura
+            <div className="flex items-center justify-between mb-8">
+              <h2 className="text-2xl font-playfair font-black uppercase tracking-tighter italic">
+                Finalizar <span className="text-primary tracking-normal">Acesso</span>
               </h2>
               <motion.button
                 onClick={onClose}
-                className="p-2 hover:bg-gray-700/50 rounded-full transition-colors"
-                whileHover={{ scale: 1.1, rotate: 90 }}
-                whileTap={{ scale: 0.9 }}
+                className="p-1 hover:bg-white/10 rounded-full transition-colors"
+                whileHover={{ rotate: 90 }}
               >
-                <X className="w-5 h-5" />
+                <X className="w-6 h-6" />
               </motion.button>
             </div>
 
             {selectedPlan && (
               <motion.div
-                className="bg-gradient-to-r from-purple-600/20 to-pink-600/20 rounded-2xl p-4 mb-6 border border-purple-500/30 backdrop-blur-sm"
-                initial={{ scale: 0.9, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
+                className="bg-white/5 border border-white/10 p-5 mb-8 relative overflow-hidden group"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
                 transition={{ delay: 0.1 }}
               >
+                <div className="absolute top-0 right-0 bg-primary px-3 py-1 text-[10px] font-black uppercase tracking-widest">
+                  VIP Selection
+                </div>
                 <div className="flex items-center justify-between">
                   <div>
-                    <h3 className="font-semibold text-lg">{selectedPlan.name}</h3>
+                    <h3 className="font-playfair text-xl font-bold italic">{selectedPlan.name}</h3>
                     {selectedPlan.discount && (
-                      <span className="text-sm text-green-400 font-medium bg-green-400/10 px-2 py-1 rounded-full">
+                      <span className="text-[10px] text-primary font-bold uppercase tracking-widest">
                         {selectedPlan.discount}
                       </span>
                     )}
                   </div>
                   <div className="text-right">
-                    <div className="font-bold text-xl bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
+                    <div className="font-black text-2xl">
                       {selectedPlan.price}
                     </div>
                     {selectedPlan.originalPrice && (
-                      <div className="text-sm text-gray-400 line-through">{selectedPlan.originalPrice}</div>
+                      <div className="text-[10px] text-gray-500 line-through tracking-tighter uppercase">{selectedPlan.originalPrice}</div>
                     )}
                   </div>
                 </div>
               </motion.div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
-              <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.2 }}>
-                <Label htmlFor="dialog-name" className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-2">
-                  <User className="w-4 h-4 text-purple-400" />
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <div className="space-y-2">
+                <Label htmlFor="dialog-name" className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                  <User className="w-3 h-3 text-primary" />
                   Nome Completo
                 </Label>
                 <Input
@@ -152,15 +154,15 @@ export function SignupDialog({ isOpen, onClose, selectedPlan, user }: SignupDial
                   type="text"
                   value={formData.name}
                   onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                  className="bg-gray-800/50 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20 rounded-xl h-12"
-                  placeholder="Digite seu nome completo"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-primary focus:ring-0 rounded-none h-14 font-medium"
+                  placeholder="DIGITE SEU NOME"
                   required
                 />
-              </motion.div>
+              </div>
 
-              <motion.div initial={{ x: -20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} transition={{ delay: 0.3 }}>
-                <Label htmlFor="dialog-email" className="text-sm font-medium text-gray-300 flex items-center gap-2 mb-2">
-                  <Mail className="w-4 h-4 text-purple-400" />
+              <div className="space-y-2">
+                <Label htmlFor="dialog-email" className="text-[10px] font-mono uppercase tracking-[0.2em] text-gray-400 flex items-center gap-2">
+                  <Mail className="w-3 h-3 text-primary" />
                   E-mail
                 </Label>
                 <Input
@@ -168,56 +170,42 @@ export function SignupDialog({ isOpen, onClose, selectedPlan, user }: SignupDial
                   type="email"
                   value={formData.email}
                   onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                  className="bg-gray-800/50 border-gray-600/50 text-white placeholder:text-gray-400 focus:border-purple-500 focus:ring-purple-500/20 rounded-xl h-12"
-                  placeholder="seu@email.com"
+                  className="bg-white/5 border-white/10 text-white placeholder:text-gray-600 focus:border-primary focus:ring-0 rounded-none h-14 font-medium"
+                  placeholder="SEU@EMAIL.COM"
                   required
                 />
-              </motion.div>
+              </div>
 
               {error && (
-                <motion.p
-                  initial={{ opacity: 0, y: -10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="text-sm text-red-400 bg-red-500/10 border border-red-500/20 rounded-xl p-3"
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-xs text-red-500 font-mono uppercase tracking-tight bg-red-500/5 border border-red-500/20 p-4"
                 >
                   {error}
-                </motion.p>
+                </motion.div>
               )}
 
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ delay: 0.4 }}>
-                <Button
-                  type="submit"
-                  disabled={isLoading}
-                  className="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 text-white font-semibold py-4 rounded-2xl mt-2 h-14 text-lg shadow-lg shadow-purple-500/25 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-300"
-                >
-                  {isLoading ? (
-                    <motion.div
-                      className="flex items-center justify-center gap-2"
-                      animate={{ opacity: [0.5, 1, 0.5] }}
-                      transition={{ duration: 1.5, repeat: Number.POSITIVE_INFINITY }}
-                    >
-                      <Loader2 className="w-5 h-5 animate-spin" />
-                      Gerando PIX...
-                    </motion.div>
-                  ) : (
-                    <motion.span whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
-                      Gerar PIX
-                    </motion.span>
-                  )}
-                </Button>
-              </motion.div>
+              <Button
+                type="submit"
+                disabled={isLoading}
+                className="w-full bg-white text-black hover:bg-primary hover:text-white font-black py-4 rounded-none h-16 text-lg uppercase tracking-[0.1em] disabled:opacity-50 transition-all duration-500"
+              >
+                {isLoading ? (
+                  <div className="flex items-center gap-3">
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                    <span className="animate-pulse">PROCESSANDO...</span>
+                  </div>
+                ) : (
+                  "GERAR ACESSO PIX"
+                )}
+              </Button>
             </form>
 
-            <motion.p
-              className="text-xs text-gray-400 text-center mt-6 leading-relaxed"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              Ao continuar, voce concorda com nossos{" "}
-              <span className="text-purple-400 hover:text-purple-300 cursor-pointer">termos de uso</span> e{" "}
-              <span className="text-purple-400 hover:text-purple-300 cursor-pointer">politica de privacidade</span>.
-            </motion.p>
+            <p className="text-[10px] font-mono text-gray-500 text-center mt-8 uppercase tracking-widest leading-loose">
+              Ao continuar, você concorda com nossos <br />
+              <span className="text-white hover:text-primary cursor-pointer transition-colors">Termos de uso</span> & <span className="text-white hover:text-primary cursor-pointer transition-colors">Privacidade</span>.
+            </p>
           </motion.div>
         </motion.div>
       )}

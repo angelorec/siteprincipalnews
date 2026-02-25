@@ -66,333 +66,209 @@ export function MobileProfileSection() {
     "Sem querer me gabar, mas o melhor conteudo +18 que voce vai ver, e o meu, ta? Ja fui top criadoras no site laranjinha e na azulzinha, e hoje tenho minha propria plataforma."
 
   return (
-    <div className="max-w-md mx-auto bg-black text-white min-h-screen relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-br from-purple-900/20 via-pink-900/20 to-black animate-pulse" />
-      <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-purple-600/10 via-transparent to-transparent" />
+    <div className="max-w-md mx-auto bg-black text-white min-h-screen relative overflow-hidden font-sans">
+      {/* Dynamic Background */}
+      <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_var(--tw-gradient-stops))] from-magenta-500/10 via-black to-black" />
+      <div className="absolute inset-0 opacity-[0.03] pointer-events-none bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
 
-      <div className="relative z-10">
-        {/* Header */}
+      <motion.div
+        className="relative z-10"
+        initial="hidden"
+        animate="visible"
+        variants={{
+          hidden: { opacity: 0 },
+          visible: {
+            opacity: 1,
+            transition: { staggerChildren: 0.15 }
+          }
+        }}
+      >
+        {/* Header Section */}
         <div className="relative">
-          {/* Cover Image */}
-          <div className="relative h-48 overflow-hidden">
-            <Image src="https://i.imgur.com/c3GOCr8.jpg" alt="Cover" fill className="object-cover" priority />
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-            <div className="absolute inset-0">
-              {[...Array(6)].map((_, i) => (
-                <motion.div
-                  key={i}
-                  className="absolute w-2 h-2 bg-purple-400/30 rounded-full"
-                  animate={{
-                    x: [0, 100, 0],
-                    y: [0, -50, 0],
-                    opacity: [0, 1, 0],
-                  }}
-                  transition={{
-                    duration: 4 + i,
-                    repeat: Number.POSITIVE_INFINITY,
-                    delay: i * 0.5,
-                  }}
-                  style={{
-                    left: `${20 + i * 15}%`,
-                    top: `${30 + i * 10}%`,
-                  }}
+          {/* Cover Image with Glass Overlay */}
+          <motion.div
+            className="relative h-64 overflow-hidden"
+            variants={{
+              hidden: { y: -20, opacity: 0 },
+              visible: { y: 0, opacity: 1 }
+            }}
+          >
+            <Image src="https://i.imgur.com/c3GOCr8.jpg" alt="Cover" fill className="object-cover scale-105" priority />
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+          </motion.div>
+
+          {/* Profile Identity - Asymmetric Overlap */}
+          <div className="relative px-6 -mt-16 flex flex-col items-start">
+            <motion.div
+              className="relative mb-6"
+              variants={{
+                hidden: { scale: 0.8, opacity: 0 },
+                visible: { scale: 1, opacity: 1, transition: { type: "spring", damping: 12 } }
+              }}
+            >
+              <div className="w-28 h-28 rounded-sm overflow-hidden border-2 border-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+                <Image
+                  src="https://i.imgur.com/JFb3R8k.jpg"
+                  alt="Natalia Katowicz"
+                  width={112}
+                  height={112}
+                  className="object-cover w-full h-full"
                 />
-              ))}
-            </div>
-          </div>
-
-          {/* Profile Section */}
-          <div className="relative px-4 -mt-16">
-            <div className="flex items-end gap-4 mb-4">
+              </div>
               <motion.div
-                className="relative"
-                whileHover={{ scale: 1.05 }}
-                transition={{ type: "spring", stiffness: 300 }}
+                className="absolute -bottom-2 -right-2 w-8 h-8 bg-primary rounded-full flex items-center justify-center shadow-lg border-2 border-black"
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 2, repeat: Infinity }}
               >
-                <div className="w-20 h-20 rounded-full overflow-hidden border-4 border-purple-500/50 shadow-lg shadow-purple-500/25">
-                  <Image
-                    src="https://i.imgur.com/JFb3R8k.jpg"
-                    alt="Natalia Katowicz"
-                    width={80}
-                    height={80}
-                    className="object-cover w-full h-full"
-                  />
-                </div>
-                <motion.div
-                  className="absolute -bottom-1 -right-1 w-6 h-6 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center shadow-lg"
-                  animate={{ rotate: 360 }}
-                  transition={{ duration: 3, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                >
-                  <span className="text-xs">{'✓'}</span>
-                </motion.div>
+                <span className="text-sm font-bold">✓</span>
               </motion.div>
-
-              <div className="flex flex-wrap gap-3 text-sm text-gray-300 mb-2">
-                <motion.div
-                  className="flex items-center gap-1 bg-gray-800/50 px-2 py-1 rounded-full backdrop-blur-sm"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <ImageIcon className="w-4 h-4 text-purple-400" />
-                  <span className="font-medium">108</span>
-                </motion.div>
-                <motion.div
-                  className="flex items-center gap-1 bg-gray-800/50 px-2 py-1 rounded-full backdrop-blur-sm"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <Video className="w-4 h-4 text-pink-400" />
-                  <span className="font-medium">113</span>
-                </motion.div>
-                <motion.div
-                  className="flex items-center gap-1 bg-gray-800/50 px-2 py-1 rounded-full backdrop-blur-sm"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <Users className="w-4 h-4 text-blue-400" />
-                  <span className="font-medium">5</span>
-                </motion.div>
-                <motion.div
-                  className="flex items-center gap-1 bg-gray-800/50 px-2 py-1 rounded-full backdrop-blur-sm"
-                  whileHover={{ scale: 1.05 }}
-                >
-                  <Heart className="w-4 h-4 text-red-500" />
-                  <span className="font-medium">28.2K</span>
-                </motion.div>
-              </div>
-            </div>
-
-            {/* Name and Handle */}
-            <motion.div
-              className="mb-4"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
-              <div className="flex items-center gap-2 mb-1">
-                <h1 className="text-xl font-bold bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                  NATALIA KATOWICZ
-                </h1>
-                <motion.div
-                  className="w-5 h-5 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center"
-                  animate={{ rotate: [0, 360] }}
-                  transition={{ duration: 2, repeat: Number.POSITIVE_INFINITY, ease: "linear" }}
-                >
-                  <span className="text-xs text-white">{'✓'}</span>
-                </motion.div>
-              </div>
-              <p className="text-gray-400 text-sm">@nataliakatowicz</p>
             </motion.div>
 
-            <motion.div className="mb-6" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.3 }}>
-              <motion.p className="text-sm text-gray-300 leading-relaxed break-words" layout>
+            {/* Typography focused Name */}
+            <motion.div
+              className="mb-6 w-full"
+              variants={{
+                hidden: { x: -20, opacity: 0 },
+                visible: { x: 0, opacity: 1 }
+              }}
+            >
+              <h1 className="text-4xl font-playfair font-black tracking-tighter mb-1 uppercase">
+                Natalia <span className="text-primary tracking-normal italic">Katowicz</span>
+              </h1>
+              <div className="flex items-center gap-2">
+                <span className="text-gray-500 font-mono text-xs tracking-widest uppercase">@nataliakatowicz</span>
+                <div className="h-px flex-1 bg-gradient-to-r from-gray-800 to-transparent" />
+              </div>
+            </motion.div>
+
+            {/* Quick Stats Grid - Custom Layout */}
+            <motion.div
+              className="grid grid-cols-4 gap-4 w-full mb-8 bg-white/5 backdrop-blur-sm p-4 border-y border-white/10"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: { opacity: 1 }
+              }}
+            >
+              {[
+                { label: "Posts", val: "108", icon: ImageIcon, color: "text-primary" },
+                { label: "Vids", val: "113", icon: Video, color: "text-secondary" },
+                { label: "Stars", val: "5", icon: Users, color: "text-blue-400" },
+                { label: "Likes", val: "28k", icon: Heart, color: "text-red-500" }
+              ].map((stat, i) => (
+                <div key={i} className="flex flex-col items-center gap-1">
+                  <stat.icon className={`w-4 h-4 ${stat.color} opacity-80`} />
+                  <span className="font-bold text-sm leading-none">{stat.val}</span>
+                  <span className="text-[10px] text-gray-500 uppercase font-medium">{stat.label}</span>
+                </div>
+              ))}
+            </motion.div>
+
+            {/* Bio Section - Floating Typography */}
+            <motion.div
+              className="mb-8"
+              variants={{
+                hidden: { opacity: 0 },
+                visible: { opacity: 1 }
+              }}
+            >
+              <p className="text-sm text-gray-400 leading-relaxed italic border-l-2 border-primary pl-4 py-1">
                 {showFullBio ? fullBio : shortBio}
-              </motion.p>
-              <motion.button
-                className="text-purple-400 text-sm mt-2 hover:text-purple-300 transition-colors font-medium"
+              </p>
+              <button
+                className="text-white text-xs mt-3 uppercase tracking-widest font-bold flex items-center gap-2 group"
                 onClick={() => setShowFullBio(!showFullBio)}
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
               >
-                {showFullBio ? "Ver menos" : "Ver mais"}
-              </motion.button>
+                {showFullBio ? "Menos" : "Mais"}
+                <div className="w-8 h-px bg-white group-hover:w-12 transition-all" />
+              </button>
             </motion.div>
 
+            {/* Membership Header */}
             <motion.div
-              className="mb-6"
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.4 }}
+              className="w-full mb-6"
+              variants={{
+                hidden: { opacity: 0, y: 10 },
+                visible: { opacity: 1, y: 0 }
+              }}
             >
-              <h3 className="text-lg font-semibold mb-4 text-center bg-gradient-to-r from-purple-400 to-pink-400 bg-clip-text text-transparent">
-                Assinaturas
+              <h3 className="text-xs font-mono tracking-[0.3em] uppercase text-gray-500 mb-4 flex items-center gap-3">
+                <div className="h-px flex-1 bg-gray-800" />
+                Select Your Access
+                <div className="h-px flex-1 bg-gray-800" />
               </h3>
-              <div className="space-y-3">
+
+              <div className="space-y-4">
                 {plans.map((plan, index) => (
                   <motion.button
                     key={plan.id}
-                    initial={{ opacity: 0, x: -50 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
-                    whileHover={{
-                      scale: 1.02,
-                      boxShadow: "0 10px 30px rgba(168, 85, 247, 0.3)",
+                    variants={{
+                      hidden: { x: index % 2 === 0 ? -20 : 20, opacity: 0 },
+                      visible: { x: 0, opacity: 1 }
                     }}
+                    whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handlePlanClick(plan.id)}
-                    className="w-full bg-gradient-to-r from-gray-800/80 to-gray-700/80 backdrop-blur-sm rounded-2xl p-4 border border-gray-600/50 hover:border-purple-500/50 transition-all duration-300 relative overflow-hidden group"
+                    className="w-full relative group overflow-hidden"
                   >
-                    <div className="absolute inset-0 bg-gradient-to-r from-purple-600/10 to-pink-600/10 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-
-                    <div className="relative z-10 flex items-center justify-between">
-                      <div className="flex items-center gap-3">
-                        <div className="flex flex-col items-start">
-                          <span className="font-semibold text-white text-lg">{plan.name}</span>
-                          {plan.popular && (
-                            <Badge className="bg-gradient-to-r from-yellow-500 to-orange-500 text-black text-xs px-2 py-0.5 mt-1 font-bold">
-                              POPULAR
-                            </Badge>
-                          )}
-                        </div>
+                    <div className="absolute inset-0 bg-white/5 border border-white/10 group-hover:border-primary/50 transition-colors" />
+                    {plan.popular && (
+                      <div className="absolute top-0 right-0 bg-primary px-3 py-1 text-[10px] font-black uppercase tracking-tighter">
+                        Most Wanted
                       </div>
+                    )}
 
-                      <div className="text-right">
-                        <div className="font-bold text-xl text-white">{plan.price}</div>
+                    <div className="relative p-5 flex items-center justify-between">
+                      <div className="flex flex-col items-start">
+                        <span className="font-playfair text-xl font-bold italic">{plan.name}</span>
+                        {plan.discount && (
+                          <span className="text-[10px] text-primary font-bold uppercase tracking-widest">{plan.discount}</span>
+                        )}
+                      </div>
+                      <div className="flex flex-col items-end">
+                        <span className="text-2xl font-black">{plan.price}</span>
                         {plan.originalPrice && (
-                          <div className="text-sm text-gray-400 line-through">{plan.originalPrice}</div>
+                          <span className="text-[10px] text-gray-600 line-through tracking-tighter">{plan.originalPrice}</span>
                         )}
                       </div>
                     </div>
-
-                    {plan.discount && (
-                      <motion.div
-                        className="absolute -top-1 -right-1 bg-gradient-to-r from-red-500 to-red-600 text-white text-xs px-3 py-1 rounded-full font-bold shadow-lg"
-                        animate={{
-                          scale: [1, 1.1, 1],
-                          rotate: [0, 5, -5, 0],
-                        }}
-                        transition={{
-                          duration: 2,
-                          repeat: Number.POSITIVE_INFINITY,
-                          repeatDelay: 3,
-                        }}
-                      >
-                        {plan.discount}
-                      </motion.div>
-                    )}
                   </motion.button>
                 ))}
               </div>
             </motion.div>
 
-            {/* Stats */}
+            {/* Exclusive Preview Locked Section */}
             <motion.div
-              className="bg-gradient-to-r from-gray-900/80 to-gray-800/80 backdrop-blur-sm rounded-2xl p-5 mb-6 border border-gray-700/50"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.9 }}
+              className="w-full pb-12"
+              variants={{
+                hidden: { opacity: 0, scale: 0.95 },
+                visible: { opacity: 1, scale: 1 }
+              }}
             >
-              <div className="flex justify-between">
-                <motion.div className="text-center" whileHover={{ scale: 1.1 }}>
-                  <div className="flex items-center justify-center gap-1 text-purple-400 mb-2">
-                    <ImageIcon className="w-5 h-5" />
-                    <span className="font-bold text-lg">160</span>
+              <div className="relative aspect-square w-full filter saturate-[0.2] hover:saturate-100 transition-all duration-700">
+                <Image
+                  src="https://i.imgur.com/II3RtV9.jpg"
+                  alt="Exclusive Preview"
+                  fill
+                  className="object-cover blur-[2px]"
+                />
+                <div className="absolute inset-0 bg-black/40 mix-blend-multiply" />
+                <div className="absolute inset-x-0 bottom-0 p-8 bg-gradient-to-t from-black to-transparent">
+                  <div className="flex items-center gap-4">
+                    <div className="w-12 h-px bg-primary" />
+                    <Lock className="w-8 h-8 text-white" />
+                    <div className="flex flex-col items-start">
+                      <span className="text-xs font-mono uppercase tracking-[0.2em] text-gray-400">Restricted Area</span>
+                      <span className="text-xl font-playfair font-black italic">Unlock Full Content</span>
+                    </div>
                   </div>
-                  <span className="text-xs text-gray-400 font-medium">Postagens</span>
-                </motion.div>
-                <motion.div className="text-center" whileHover={{ scale: 1.1 }}>
-                  <div className="flex items-center justify-center gap-1 text-pink-400 mb-2">
-                    <Video className="w-5 h-5" />
-                    <span className="font-bold text-lg">221</span>
-                  </div>
-                  <span className="text-xs text-gray-400 font-medium">Midias</span>
-                </motion.div>
-                <motion.div className="text-center" whileHover={{ scale: 1.1 }}>
-                  <div className="flex items-center justify-center gap-1 text-blue-400 mb-2">
-                    <Users className="w-5 h-5" />
-                    <span className="font-bold text-lg">2.8K</span>
-                  </div>
-                  <span className="text-xs text-gray-400 font-medium">Fas</span>
-                </motion.div>
+                </div>
               </div>
             </motion.div>
           </div>
         </div>
+      </motion.div>
 
-        <div className="px-4 pb-8">
-          <motion.div
-            className="relative"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.0 }}
-          >
-            {/* Profile Header for Locked Section */}
-            <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full overflow-hidden border-2 border-purple-500/50">
-                <Image
-                  src="https://i.imgur.com/JFb3R8k.jpg"
-                  alt="Natalia Katowicz"
-                  width={40}
-                  height={40}
-                  className="object-cover w-full h-full"
-                />
-              </div>
-              <div>
-                <div className="flex items-center gap-2">
-                  <span className="font-semibold text-sm">NATALIA KATOWICZ</span>
-                  <div className="w-4 h-4 bg-gradient-to-r from-purple-500 to-pink-500 rounded-full flex items-center justify-center">
-                    <span className="text-xs text-white">{'✓'}</span>
-                  </div>
-                </div>
-                <span className="text-gray-400 text-xs">@nataliakatowicz</span>
-              </div>
-            </div>
-
-            {/* Locked Content */}
-            <motion.div
-              className="relative bg-gradient-to-br from-gray-900/80 to-gray-800/80 backdrop-blur-sm rounded-2xl overflow-hidden border border-gray-700/50"
-              whileHover={{ scale: 1.02 }}
-              transition={{ type: "spring", stiffness: 300 }}
-            >
-              <div className="aspect-square relative">
-                <div className="absolute inset-0">
-                  <Image
-                    src="https://i.imgur.com/II3RtV9.jpg"
-                    alt="Locked content"
-                    fill
-                    className="object-cover blur-[20px] scale-110"
-                  />
-                  <div className="absolute inset-0 bg-black/60" />
-                </div>
-
-                <div className="absolute inset-0 flex items-center justify-center">
-                  <motion.div
-                    className="bg-black/70 rounded-full p-8 backdrop-blur-md border border-purple-500/30"
-                    animate={{
-                      scale: [1, 1.1, 1],
-                      boxShadow: [
-                        "0 0 20px rgba(168, 85, 247, 0.3)",
-                        "0 0 40px rgba(168, 85, 247, 0.5)",
-                        "0 0 20px rgba(168, 85, 247, 0.3)",
-                      ],
-                    }}
-                    transition={{
-                      duration: 2,
-                      repeat: Number.POSITIVE_INFINITY,
-                      ease: "easeInOut",
-                    }}
-                  >
-                    <Lock className="w-16 h-16 text-purple-400" />
-                  </motion.div>
-                </div>
-
-                <div className="absolute bottom-4 left-4 right-4 flex justify-between text-white text-sm">
-                  <motion.div
-                    className="flex items-center gap-1 bg-black/50 px-2 py-1 rounded-full backdrop-blur-sm"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <ImageIcon className="w-4 h-4 text-purple-400" />
-                    <span className="font-medium">108</span>
-                  </motion.div>
-                  <motion.div
-                    className="flex items-center gap-1 bg-black/50 px-2 py-1 rounded-full backdrop-blur-sm"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <Video className="w-4 h-4 text-pink-400" />
-                    <span className="font-medium">113</span>
-                  </motion.div>
-                  <motion.div
-                    className="flex items-center gap-1 bg-black/50 px-2 py-1 rounded-full backdrop-blur-sm"
-                    whileHover={{ scale: 1.05 }}
-                  >
-                    <Heart className="w-4 h-4 text-red-500" />
-                    <span className="font-medium">28.2K</span>
-                  </motion.div>
-                </div>
-              </div>
-            </motion.div>
-          </motion.div>
-        </div>
-      </div>
-
-      {/* Signup Dialog - auto-fills from Supabase user */}
+      {/* Signup Dialog */}
       <SignupDialog
         isOpen={!!selectedPlan}
         onClose={() => setSelectedPlan(null)}

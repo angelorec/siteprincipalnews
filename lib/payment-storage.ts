@@ -1,4 +1,4 @@
-// In-memory storage for development (use database in production)
+// Storage for transactions (using localStorage for client-side persistence)
 export interface PaymentTransaction {
   transactionId: string
   planId: string
@@ -16,48 +16,74 @@ export interface PaymentTransaction {
   }
 }
 
-// Global storage for transactions
-const transactions = new Map<string, PaymentTransaction>()
+const STORAGE_KEY = "natkat_payments"
+
+const getStoredTransactions = (): Map<string, PaymentTransaction> => {
+  if (typeof window === "undefined") return new Map()
+  const stored = localStorage.getItem(STORAGE_KEY)
+  if (!stored) return new Map()
+  try {
+    const parsed = JSON.parse(stored)
+    return new Map(Object.entries(parsed))
+  } catch {
+    return new Map()
+  }
+}
+
+const saveTransactions = (transactions: Map<string, PaymentTransaction>) => {
+  if (typeof window === "undefined") return
+  const obj = Object.fromEntries(transactions)
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(obj))
+}
 
 export const PaymentStorage = {
   create: (transaction: PaymentTransaction) => {
+    const transactions = getStoredTransactions()
     transactions.set(transaction.transactionId, transaction)
+    saveTransactions(transactions)
     return transaction
   },
 
   get: (transactionId: string): PaymentTransaction | null => {
+    const transactions = getStoredTransactions()
     return transactions.get(transactionId) || null
   },
 
   update: (transactionId: string, updates: Partial<PaymentTransaction>): PaymentTransaction | null => {
+    const transactions = getStoredTransactions()
     const existing = transactions.get(transactionId)
     if (!existing) return null
 
     const updated = { ...existing, ...updates }
     transactions.set(transactionId, updated)
+    saveTransactions(transactions)
     return updated
   },
 
   getAll: (): PaymentTransaction[] => {
+    const transactions = getStoredTransactions()
     return Array.from(transactions.values())
   },
 
   delete: (transactionId: string): boolean => {
-    return transactions.delete(transactionId)
+    const transactions = getStoredTransactions()
+    const deleted = transactions.delete(transactionId)
+    if (deleted) saveTransactions(transactions)
+    return deleted
   },
 
-  // Get transactions by status
   getByStatus: (status: PaymentTransaction["status"]): PaymentTransaction[] => {
+    const transactions = getStoredTransactions()
     return Array.from(transactions.values()).filter((t) => t.status === status)
   },
 
-  // Get transactions by plan
   getByPlan: (planId: string): PaymentTransaction[] => {
+    const transactions = getStoredTransactions()
     return Array.from(transactions.values()).filter((t) => t.planId === planId)
   },
 
-  // Clean up expired transactions
   cleanupExpired: (): number => {
+    const transactions = getStoredTransactions()
     const now = new Date()
     let cleaned = 0
 
@@ -68,6 +94,7 @@ export const PaymentStorage = {
       }
     }
 
+    if (cleaned > 0) saveTransactions(transactions)
     return cleaned
   },
 }

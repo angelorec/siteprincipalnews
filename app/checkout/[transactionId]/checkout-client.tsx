@@ -57,11 +57,11 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
           const mockData: PaymentData = {
             transactionId,
             qrcodeImageUrl: `/placeholder.svg?height=300&width=300&query=QR Code PIX`,
-            pixCopiaECola: `00020126580014br.gov.bcb.pix0136${transactionId}520400005303986540${(4999 / 100).toFixed(2)}5802BR5925Natalia Katowicz6009SAO PAULO62070503***6304`,
+            pixCopiaECola: `00020126580014br.gov.bcb.pix0136${transactionId}520400005303986540${(1990 / 100).toFixed(2)}5802BR5925Natalia Katowicz6009SAO PAULO62070503***6304`,
             expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
             status: "PENDING",
             planId: "premium",
-            amount: 4999,
+            amount: 1990,
           }
           setPaymentData(mockData)
         }

@@ -53,6 +53,20 @@ export function PlanDialog({ plan, open, onOpenChange }: PlanDialogProps) {
       }
 
       const data = await response.json()
+
+      // Store in local storage to prevent fallback to mock data
+      const { PaymentStorage } = await import("@/lib/payment-storage")
+      PaymentStorage.create({
+        transactionId: data.transactionId,
+        planId: plan.id,
+        amount: plan.price,
+        status: "PENDING",
+        pixCopiaECola: data.pixPayload || "",
+        qrcodeBase64: data.qrcodeBase64 || "",
+        expiresAt: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
+        createdAt: new Date().toISOString(),
+      })
+
       router.push(`/checkout/${data.transactionId}`)
     } catch (error) {
       console.error("Erro ao gerar PIX:", error)
@@ -66,46 +80,40 @@ export function PlanDialog({ plan, open, onOpenChange }: PlanDialogProps) {
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent className="glass-strong max-w-md">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            {plan.popular && <Crown className="w-5 h-5 text-primary" />}
-            {plan.title}
-          </DialogTitle>
-          <DialogDescription>Confirme os detalhes do seu plano</DialogDescription>
-        </DialogHeader>
 
-        <div className="space-y-6">
-          <div className="text-center">
-            <div className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
-              {formatPrice(plan.price)}
-            </div>
-            <div className="text-muted-foreground">por {plan.period}</div>
-          </div>
-
-          <div className="space-y-3">
-            <h4 className="font-semibold">Incluído no plano:</h4>
-            {plan.features.map((feature, index) => (
-              <div key={index} className="flex items-center gap-3">
-                <Check className="w-4 h-4 text-primary flex-shrink-0" />
-                <span className="text-sm">{feature}</span>
+          <div className="space-y-6">
+            <div className="text-center">
+              <div className="text-3xl font-bold bg-gradient-to-r from-primary to-secondary bg-clip-text text-transparent">
+                {formatPrice(plan.price)}
               </div>
-            ))}
-          </div>
+              <div className="text-muted-foreground">por {plan.period}</div>
+            </div>
 
-          <Button
-            onClick={handleGeneratePix}
-            disabled={isLoading}
-            className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
-          >
-            {isLoading ? (
-              <>
-                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                Gerando PIX...
-              </>
-            ) : (
-              "Gerar PIX"
-            )}
-          </Button>
-        </div>
+            <div className="space-y-3">
+              <h4 className="font-semibold">Incluído no plano:</h4>
+              {plan.features.map((feature, index) => (
+                <div key={index} className="flex items-center gap-3">
+                  <Check className="w-4 h-4 text-primary flex-shrink-0" />
+                  <span className="text-sm">{feature}</span>
+                </div>
+              ))}
+            </div>
+
+            <Button
+              onClick={handleGeneratePix}
+              disabled={isLoading}
+              className="w-full bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90"
+            >
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Gerando PIX...
+                </>
+              ) : (
+                "Gerar PIX"
+              )}
+            </Button>
+          </div>
       </DialogContent>
     </Dialog>
   )

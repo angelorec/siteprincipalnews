@@ -120,7 +120,7 @@ export function MobileProfileSection() {
             variants={itemVariants(-10)}
           >
             <Image
-              src="https://i.imgur.com/GpsneJf.jpg"
+              src="/cover-v2.png"
               alt="Cover"
               fill
               sizes="(max-width: 768px) 100vw, 800px"

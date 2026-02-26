@@ -9,7 +9,7 @@ export function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/cover-photo.png"
+          src="/cover-v2.png"
           alt="Natália Katowicz Cover"
           fill
           className="object-cover"

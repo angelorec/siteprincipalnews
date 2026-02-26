@@ -1,7 +1,5 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { lirapay } from "@/lib/lirapay"
-import { PaymentStorage } from "@/lib/payment-storage"
-import { moveUserToApproved } from "@/lib/supabase/auth-utils"
 
 export async function GET(
     request: NextRequest,
@@ -25,18 +23,6 @@ export async function GET(
             status = "PAID"
         } else if (response.status === "FAILED") {
             status = "CANCELLED"
-        }
-
-        const localTransaction = PaymentStorage.get(transactionId)
-
-        // Ensure credentials are moved if we detect payment here
-        if (status === "PAID" && localTransaction?.customer?.email) {
-            await moveUserToApproved(localTransaction.customer.email)
-        }
-
-        // Update local storage if status changed
-        if (localTransaction && localTransaction.status !== status) {
-            PaymentStorage.update(transactionId, { status })
         }
 
         return NextResponse.json({

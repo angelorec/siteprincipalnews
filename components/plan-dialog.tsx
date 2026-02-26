@@ -6,6 +6,8 @@ import { Button } from "@/components/ui/button"
 import { Check, Crown, Loader2 } from "lucide-react"
 import { useRouter } from "next/navigation"
 
+import { PaymentStorage } from "@/lib/payment-storage"
+
 interface Plan {
   id: string
   title: string
@@ -43,8 +45,12 @@ export function PlanDialog({ plan, open, onOpenChange }: PlanDialogProps) {
         },
         body: JSON.stringify({
           planId: plan.id,
-          amount: plan.price,
-          description: `Assinatura ${plan.title} - Natália Katowicz`,
+          customerData: {
+            name: "Customer", // This should come from a form, but using placeholder for now to match API schema
+            email: "customer@example.com",
+            phone: "11999999999",
+            document: "00000000000"
+          }
         }),
       })
 
@@ -55,7 +61,6 @@ export function PlanDialog({ plan, open, onOpenChange }: PlanDialogProps) {
       const data = await response.json()
 
       // Store in local storage to prevent fallback to mock data
-      const { PaymentStorage } = await import("@/lib/payment-storage")
       PaymentStorage.create({
         transactionId: data.transactionId,
         planId: plan.id,

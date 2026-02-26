@@ -344,9 +344,9 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
               <div className="text-center">
                 <h3 className="text-lg font-semibold mb-4">Escaneie o QR Code</h3>
                 <div className="bg-white p-4 rounded-2xl inline-block shadow-lg">
-                  {paymentData.qrcodeBase64 ? (
+                  {paymentData.qrcodeBase64 || paymentData.qrcodeImageUrl ? (
                     <Image
-                      src={paymentData.qrcodeBase64}
+                      src={paymentData.qrcodeBase64 || paymentData.qrcodeImageUrl || ""}
                       alt="QR Code PIX"
                       width={300}
                       height={300}

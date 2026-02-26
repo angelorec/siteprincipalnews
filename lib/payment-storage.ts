@@ -20,12 +20,14 @@ const STORAGE_KEY = "natkat_payments"
 
 const getStoredTransactions = (): Map<string, PaymentTransaction> => {
   if (typeof window === "undefined") return new Map()
-  const stored = localStorage.getItem(STORAGE_KEY)
-  if (!stored) return new Map()
   try {
+    const stored = localStorage.getItem(STORAGE_KEY)
+    if (!stored) return new Map()
     const parsed = JSON.parse(stored)
+    // Handle both Map-like objects and plain objects
     return new Map(Object.entries(parsed))
-  } catch {
+  } catch (error) {
+    console.error("[PaymentStorage] Error reading from localStorage:", error)
     return new Map()
   }
 }

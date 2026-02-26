@@ -8,7 +8,7 @@ export function HeroSection() {
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden">
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
-        <Image src="https://i.imgur.com/erUs01I.jpg" alt="Natália Katowicz Cover" fill className="object-cover" priority />
+        <Image src="https://i.imgur.com/JcPhpPg.jpg" alt="Natália Katowicz Cover" fill className="object-cover" priority />
         <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/60 to-background/40" />
       </div>
 

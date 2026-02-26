@@ -1,12 +1,6 @@
-"use client"
+import QRCode from "qrcode"
 
-import { useEffect, useState } from "react"
-import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Copy, CheckCircle, Clock, Smartphone, AlertCircle, RefreshCw, ArrowLeft } from "lucide-react"
-import { useRouter } from "next/navigation"
-import Image from "next/image"
+// ... (imports remain same)
 import { PaymentStorage } from "@/lib/payment-storage"
 
 interface PaymentData {
@@ -35,6 +29,22 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
   const [redirectProgress, setRedirectProgress] = useState(0)
   const router = useRouter()
 
+  const generateQrCode = async (payload: string) => {
+    try {
+      return await QRCode.toDataURL(payload, {
+        width: 400,
+        margin: 1,
+        color: {
+          dark: "#000000",
+          light: "#FFFFFF",
+        },
+      })
+    } catch (err) {
+      console.error("Error generating QR code:", err)
+      return ""
+    }
+  }
+
   // Fetch initial payment data
   useEffect(() => {
     const fetchPaymentData = async () => {
@@ -53,17 +63,8 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
             amount: localTransaction.amount,
           })
         } else {
-          // Fallback mock data for development
-          const mockData: PaymentData = {
-            transactionId,
-            qrcodeImageUrl: `/placeholder.svg?height=300&width=300&query=QR Code PIX`,
-            pixCopiaECola: `00020126580014br.gov.bcb.pix0136${transactionId}520400005303986540${(1990 / 100).toFixed(2)}5802BR5925Natalia Katowicz6009SAO PAULO62070503***6304`,
-            expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
-            status: "PENDING",
-            planId: "premium",
-            amount: 1990,
-          }
-          setPaymentData(mockData)
+          // If not in storage, wait for first poll to populate from API
+          console.log("[Checkout] Transaction not found in storage, waiting for API rescue...")
         }
       } catch (error) {
         console.error("Error fetching payment data:", error)
@@ -77,8 +78,6 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
 
   // Poll payment status
   useEffect(() => {
-    if (!paymentData || paymentData.status !== "PENDING") return
-
     const pollStatus = async () => {
       setIsPolling(true)
       try {
@@ -86,6 +85,28 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
         const data = await response.json()
 
         setPollCount((prev) => prev + 1)
+
+        // Rescue data if state is empty or missing amount/pix
+        if (data.pixPayload && (!paymentData || !paymentData.pixCopiaECola || !paymentData.amount)) {
+          const qrBase64 = await generateQrCode(data.pixPayload)
+          const newData: PaymentData = {
+            transactionId: data.transactionId || transactionId,
+            pixCopiaECola: data.pixPayload,
+            qrcodeBase64: qrBase64,
+            amount: data.amount,
+            status: data.status,
+            expiresAt: paymentData?.expiresAt || new Date(Date.now() + 3600 * 1000).toISOString(),
+          }
+          setPaymentData(newData)
+
+          // Also save back to storage
+          PaymentStorage.create({
+            ...newData,
+            createdAt: new Date().toISOString(),
+            planId: "detected",
+            amount: data.amount
+          })
+        }
 
         if (data.status === "PAID") {
           setPaymentData((prev) => (prev ? { ...prev, status: "PAID" } : null))
@@ -101,6 +122,7 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
     }
 
     const interval = setInterval(pollStatus, 3000) // Poll every 3 seconds
+    pollStatus() // Initial call
     return () => clearInterval(interval)
   }, [paymentData, transactionId, router])
 

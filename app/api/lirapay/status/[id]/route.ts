@@ -1,3 +1,4 @@
+import { type NextRequest, NextResponse } from "next/server"
 import { lirapay } from "@/lib/lirapay"
 import { PaymentStorage } from "@/lib/payment-storage"
 import { moveUserToApproved } from "@/lib/supabase/auth-utils"
@@ -13,12 +14,6 @@ export async function GET(
             return NextResponse.json({ error: "Transaction ID is required" }, { status: 400 })
         }
 
-        // Check local storage first
-        const localTransaction = PaymentStorage.get(transactionId)
-        if (localTransaction && (localTransaction.status === "PAID" || localTransaction.status === "EXPIRED")) {
-            return NextResponse.json({ status: localTransaction.status })
-        }
-
         // Poll LiraPay API
         const response = await lirapay.getTransaction(transactionId)
 
@@ -28,12 +23,15 @@ export async function GET(
 
         if (response.status === "AUTHORIZED") {
             status = "PAID"
-            // Ensure credentials are moved if we detect payment here
-            if (localTransaction?.customer?.email) {
-                await moveUserToApproved(localTransaction.customer.email)
-            }
         } else if (response.status === "FAILED") {
             status = "CANCELLED"
+        }
+
+        const localTransaction = PaymentStorage.get(transactionId)
+
+        // Ensure credentials are moved if we detect payment here
+        if (status === "PAID" && localTransaction?.customer?.email) {
+            await moveUserToApproved(localTransaction.customer.email)
         }
 
         // Update local storage if status changed
@@ -41,7 +39,12 @@ export async function GET(
             PaymentStorage.update(transactionId, { status })
         }
 
-        return NextResponse.json({ status })
+        return NextResponse.json({
+            status,
+            amount: response.total_value,
+            pixPayload: response.pix?.payload,
+            transactionId: response.id
+        })
     } catch (error) {
         console.error("[LiraPay] Error checking status:", error)
         return NextResponse.json({ error: "Internal server error" }, { status: 500 })

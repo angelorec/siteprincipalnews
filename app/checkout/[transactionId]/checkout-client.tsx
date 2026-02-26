@@ -2,22 +2,14 @@
 
 import { useEffect, useState } from "react"
 import { motion } from "framer-motion"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
-import { Copy, CheckCircle, Clock, Smartphone, AlertCircle, RefreshCw, ArrowLeft } from "lucide-react"
+import { Copy, CheckCircle, Clock, AlertCircle, RefreshCw, ArrowLeft } from "lucide-react"
 import { useRouter } from "next/navigation"
-import Image from "next/image"
-import QRCode from "qrcode"
-import { PaymentStorage } from "@/lib/payment-storage"
 
 interface PaymentData {
   transactionId: string
-  qrcodeImageUrl?: string
-  qrcodeBase64?: string
   pixCopiaECola: string
   expiresAt: string
   status: "PENDING" | "PAID" | "EXPIRED" | "CANCELLED"
-  planId?: string
   amount?: number
 }
 
@@ -36,74 +28,22 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
   const [redirectProgress, setRedirectProgress] = useState(0)
   const router = useRouter()
 
-  const generateQrCode = async (payload: string) => {
-    try {
-      return await QRCode.toDataURL(payload, {
-        width: 400,
-        margin: 1,
-        color: {
-          dark: "#000000",
-          light: "#FFFFFF",
-        },
-      })
-    } catch (err) {
-      console.error("Error generating QR code:", err)
-      return ""
-    }
-  }
-
-  // Fetch initial payment data from URL search params (most reliable) or API
+  // Load payment data from URL params
   useEffect(() => {
-    const fetchPaymentData = async () => {
-      try {
-        // Read from URL search params (set by PlanDialog)
-        const urlParams = new URLSearchParams(window.location.search)
-        const urlAmount = urlParams.get("amount")
-        const urlPix = urlParams.get("pix")
-        const urlQr = urlParams.get("qr")
+    const urlParams = new URLSearchParams(window.location.search)
+    const urlAmount = urlParams.get("amount")
+    const urlPix = urlParams.get("pix")
 
-        if (urlPix) {
-          // Generate QR code on the client if not provided via URL
-          let qrCode = urlQr || ""
-          if (!qrCode && urlPix) {
-            qrCode = await generateQrCode(urlPix)
-          }
-
-          setPaymentData({
-            transactionId,
-            pixCopiaECola: urlPix,
-            qrcodeBase64: qrCode,
-            amount: urlAmount ? Number(urlAmount) : undefined,
-            status: "PENDING",
-            expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
-          })
-          setLoading(false)
-          return
-        }
-
-        // Fallback: try the status API
-        const response = await fetch(`/api/lirapay/status/${transactionId}`)
-        const data = await response.json()
-
-        if (data.pixPayload) {
-          const qrBase64 = await generateQrCode(data.pixPayload)
-          setPaymentData({
-            transactionId: data.transactionId || transactionId,
-            pixCopiaECola: data.pixPayload,
-            qrcodeBase64: qrBase64,
-            amount: data.amount,
-            status: data.status || "PENDING",
-            expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
-          })
-        }
-      } catch (error) {
-        console.error("Error fetching payment data:", error)
-      } finally {
-        setLoading(false)
-      }
+    if (urlPix) {
+      setPaymentData({
+        transactionId,
+        pixCopiaECola: urlPix,
+        amount: urlAmount ? Number(urlAmount) : undefined,
+        status: "PENDING",
+        expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
+      })
     }
-
-    fetchPaymentData()
+    setLoading(false)
   }, [transactionId])
 
   // Poll payment status
@@ -115,7 +55,6 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
       try {
         const response = await fetch(`/api/lirapay/status/${transactionId}`)
         const data = await response.json()
-
         setPollCount((prev) => prev + 1)
 
         if (data.status === "PAID") {
@@ -131,7 +70,7 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
       }
     }
 
-    const interval = setInterval(pollStatus, 3000)
+    const interval = setInterval(pollStatus, 5000)
     return () => clearInterval(interval)
   }, [paymentData, transactionId])
 
@@ -158,12 +97,13 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
     const interval = setInterval(updateTimer, 1000)
     return () => clearInterval(interval)
   }, [paymentData])
+
   // Success Redirect Progress
   useEffect(() => {
     if (!showSuccessPopup) return
 
-    const duration = 7000 // 7 seconds
-    const interval = 50 // update every 50ms
+    const duration = 7000
+    const interval = 50
     const steps = duration / interval
     const increment = 100 / steps
 
@@ -189,7 +129,6 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
 
   const copyToClipboard = async () => {
     if (!paymentData) return
-
     try {
       await navigator.clipboard.writeText(paymentData.pixCopiaECola)
       setCopied(true)
@@ -199,28 +138,11 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
     }
   }
 
-  const openBankApp = () => {
-    if (!paymentData) return
-
-    // Try to open common banking apps
-    const bankApps = [
-      `nubank://qr/payment?code=${encodeURIComponent(paymentData.pixCopiaECola)}`,
-      `inter://pix/payment?code=${encodeURIComponent(paymentData.pixCopiaECola)}`,
-      `itau://pix/payment?code=${encodeURIComponent(paymentData.pixCopiaECola)}`,
-    ]
-
-    // Try the first app, fallback to generic intent
-    window.location.href = bankApps[0]
-  }
-
   const manualRefresh = async () => {
-    if (!paymentData) return
-
     setIsPolling(true)
     try {
       const response = await fetch(`/api/lirapay/status/${transactionId}`)
       const data = await response.json()
-
       if (data.status === "PAID") {
         setPaymentData((prev) => (prev ? { ...prev, status: "PAID" } : null))
         setShowSuccessPopup(true)
@@ -251,9 +173,9 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
         <div className="bg-gray-900 rounded-2xl p-8 text-center max-w-sm w-full">
           <AlertCircle className="w-12 h-12 text-red-500 mx-auto mb-4" />
           <p className="text-red-400 mb-4">Erro ao carregar dados do pagamento</p>
-          <Button onClick={() => router.push("/")} className="w-full bg-gradient-to-r from-primary to-secondary">
+          <button onClick={() => router.push("/")} className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 rounded-xl font-semibold">
             Voltar ao início
-          </Button>
+          </button>
         </div>
       </div>
     )
@@ -268,7 +190,7 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
             <ArrowLeft className="w-5 h-5" />
           </button>
           <h1 className="text-lg font-semibold">Pagamento PIX</h1>
-          <div className="w-9" /> {/* Spacer */}
+          <div className="w-9" />
         </div>
 
         <div className="p-4 space-y-6">
@@ -284,26 +206,24 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
                   <AlertCircle className="w-8 h-8 text-red-500" />
                 </div>
               ) : (
-                <div className="w-16 h-16 bg-primary/20 rounded-full flex items-center justify-center">
-                  <Clock className="w-8 h-8 text-primary" />
+                <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center">
+                  <Clock className="w-8 h-8 text-purple-400" />
                 </div>
               )}
             </div>
 
-            <Badge
-              className={`mb-4 ${paymentData.status === "PAID"
-                ? "bg-green-500/20 text-green-400 border-green-500/30"
+            <span className={`inline-block px-3 py-1 rounded-full text-sm mb-4 ${paymentData.status === "PAID"
+                ? "bg-green-500/20 text-green-400 border border-green-500/30"
                 : paymentData.status === "EXPIRED"
-                  ? "bg-red-500/20 text-red-400 border-red-500/30"
-                  : "bg-primary/20 text-primary border-primary/30"
-                }`}
-            >
+                  ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                  : "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+              }`}>
               {paymentData.status === "PAID"
                 ? "Pagamento Confirmado!"
                 : paymentData.status === "EXPIRED"
                   ? "Pagamento Expirado"
                   : "Aguardando Pagamento"}
-            </Badge>
+            </span>
 
             <h2 className="text-xl font-bold mb-2">
               {paymentData.status === "PAID"
@@ -314,7 +234,7 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
             </h2>
 
             {paymentData.amount && (
-              <p className="text-2xl font-bold text-primary mb-4">
+              <p className="text-2xl font-bold text-purple-400 mb-4">
                 R$ {(paymentData.amount / 100).toFixed(2).replace(".", ",")}
               </p>
             )}
@@ -322,7 +242,7 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
             {paymentData.status === "PENDING" && (
               <div className="bg-gray-900 rounded-xl p-4 mb-6">
                 <p className="text-sm text-gray-400 mb-1">Tempo restante:</p>
-                <p className="text-2xl font-bold text-primary mb-3">{timeLeft}</p>
+                <p className="text-2xl font-bold text-purple-400 mb-3">{timeLeft}</p>
 
                 <div className="flex items-center justify-center gap-2 text-xs text-gray-400">
                   {isPolling && <RefreshCw className="w-3 h-3 animate-spin" />}
@@ -349,12 +269,12 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
             >
               <h3 className="text-xl font-semibold mb-2">Pagamento Confirmado!</h3>
               <p className="text-gray-400 mb-6">Você será redirecionado para a área de membros em instantes...</p>
-              <Button
+              <button
                 onClick={() => router.push("/sucesso")}
-                className="w-full bg-green-500 hover:bg-green-600 text-white"
+                className="w-full bg-green-500 hover:bg-green-600 text-white py-3 rounded-xl font-semibold"
               >
                 Acessar Conteúdo
-              </Button>
+              </button>
             </motion.div>
           ) : paymentData.status === "EXPIRED" ? (
             <motion.div
@@ -365,35 +285,15 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
             >
               <h3 className="text-xl font-semibold mb-2">Pagamento Expirado</h3>
               <p className="text-gray-400 mb-6">O tempo para pagamento esgotou. Você pode gerar um novo PIX.</p>
-              <Button onClick={() => router.push("/")} className="w-full bg-gradient-to-r from-primary to-secondary">
+              <button onClick={() => router.push("/")} className="w-full bg-gradient-to-r from-purple-600 to-pink-500 text-white py-3 rounded-xl font-semibold">
                 Gerar Novo PIX
-              </Button>
+              </button>
             </motion.div>
           ) : (
             <>
-              {/* QR Code */}
-              <div className="text-center">
-                <h3 className="text-lg font-semibold mb-4">Escaneie o QR Code</h3>
-                <div className="bg-white p-4 rounded-2xl inline-block shadow-lg">
-                  {paymentData.qrcodeBase64 || paymentData.qrcodeImageUrl ? (
-                    <Image
-                      src={paymentData.qrcodeBase64 || paymentData.qrcodeImageUrl || ""}
-                      alt="QR Code PIX"
-                      width={300}
-                      height={300}
-                      className="mx-auto"
-                    />
-                  ) : (
-                    <div className="w-[300px] h-[300px] flex items-center justify-center bg-gray-100 rounded-lg">
-                      <RefreshCw className="w-8 h-8 animate-spin text-gray-400" />
-                    </div>
-                  )}
-                </div>
-              </div>
-
-              {/* Copy and Paste */}
+              {/* Copy and Paste PIX Code */}
               <div>
-                <h3 className="text-lg font-semibold mb-4">Ou copie o código PIX</h3>
+                <h3 className="text-lg font-semibold mb-4">Copie o código PIX</h3>
                 <div className="bg-gray-900 p-4 rounded-xl border border-gray-700">
                   <p className="text-xs text-gray-400 break-all font-mono leading-relaxed">
                     {paymentData.pixCopiaECola}
@@ -403,29 +303,23 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
 
               {/* Action Buttons */}
               <div className="space-y-3">
-                <Button
+                <button
                   onClick={copyToClipboard}
-                  variant="outline"
-                  className="w-full bg-gray-900 border-gray-700 text-white hover:bg-gray-800"
+                  className="w-full flex items-center justify-center gap-2 bg-gray-900 border border-gray-700 text-white py-3 rounded-xl hover:bg-gray-800"
                   disabled={copied}
                 >
-                  <Copy className="w-4 h-4 mr-2" />
-                  {copied ? "Copiado!" : "Copiar Código"}
-                </Button>
-
-                <Button onClick={openBankApp} className="w-full bg-gradient-to-r from-primary to-secondary text-white">
-                  <Smartphone className="w-4 h-4 mr-2" />
-                  Abrir App do Banco
-                </Button>
+                  <Copy className="w-4 h-4" />
+                  {copied ? "Copiado!" : "Copiar Código PIX"}
+                </button>
               </div>
 
               {/* Instructions */}
               <div className="bg-gray-900 p-4 rounded-xl">
-                <h4 className="font-semibold mb-3 text-primary">Como pagar:</h4>
+                <h4 className="font-semibold mb-3 text-purple-400">Como pagar:</h4>
                 <ol className="text-sm text-gray-300 space-y-2 list-decimal list-inside">
                   <li>Abra o app do seu banco</li>
                   <li>Escolha a opção PIX</li>
-                  <li>Escaneie o QR Code ou cole o código</li>
+                  <li>Cole o código copiado acima</li>
                   <li>Confirme o pagamento</li>
                   <li>Aguarde a confirmação automática</li>
                 </ol>
@@ -451,8 +345,8 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
               <CheckCircle className="w-10 h-10 text-green-500" />
             </div>
 
-            <h2 className="text-3xl font-playfair font-black uppercase tracking-tighter italic mb-4">
-              Obrigado pela <span className="text-primary tracking-normal">compra</span>
+            <h2 className="text-3xl font-bold mb-4">
+              Obrigado pela <span className="text-purple-400">compra</span>
             </h2>
 
             <p className="text-gray-400 leading-relaxed mb-8">
@@ -461,7 +355,7 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
 
             <div className="relative w-full h-1.5 bg-zinc-900 rounded-full overflow-hidden mb-4">
               <motion.div
-                className="absolute top-0 left-0 h-full bg-gradient-to-r from-primary to-secondary"
+                className="absolute top-0 left-0 h-full bg-gradient-to-r from-purple-600 to-pink-500"
                 style={{ width: `${redirectProgress}%` }}
               />
             </div>

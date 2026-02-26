@@ -1,9 +1,9 @@
 import { CheckoutClient } from "./checkout-client"
 
 interface CheckoutPageProps {
-  params: {
+  params: Promise<{
     transactionId: string
-  }
+  }>
 }
 
 export default async function CheckoutPage({ params }: CheckoutPageProps) {

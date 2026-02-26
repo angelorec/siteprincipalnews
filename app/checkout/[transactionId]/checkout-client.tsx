@@ -56,9 +56,10 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
   useEffect(() => {
     const fetchPaymentData = async () => {
       try {
+        // Try localStorage first
         const localTransaction = PaymentStorage.get(transactionId)
 
-        if (localTransaction) {
+        if (localTransaction && localTransaction.pixCopiaECola) {
           setPaymentData({
             transactionId: localTransaction.transactionId,
             qrcodeImageUrl: localTransaction.qrcodeImageUrl,
@@ -69,9 +70,33 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
             planId: localTransaction.planId,
             amount: localTransaction.amount,
           })
-        } else {
-          // If not in storage, wait for first poll to populate from API
-          console.log("[Checkout] Transaction not found in storage, waiting for API rescue...")
+          setLoading(false)
+          return
+        }
+
+        // If not in localStorage, rescue from API
+        console.log("[Checkout] Not in localStorage, fetching from API...")
+        const response = await fetch(`/api/lirapay/status/${transactionId}`)
+        const data = await response.json()
+
+        if (data.pixPayload) {
+          const qrBase64 = await generateQrCode(data.pixPayload)
+          const newData: PaymentData = {
+            transactionId: data.transactionId || transactionId,
+            pixCopiaECola: data.pixPayload,
+            qrcodeBase64: qrBase64,
+            amount: data.amount,
+            status: data.status || "PENDING",
+            expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
+          }
+          setPaymentData(newData)
+
+          // Save to localStorage for future use
+          PaymentStorage.create({
+            ...newData,
+            createdAt: new Date().toISOString(),
+            planId: "detected",
+          })
         }
       } catch (error) {
         console.error("Error fetching payment data:", error)
@@ -85,6 +110,8 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
 
   // Poll payment status
   useEffect(() => {
+    if (!paymentData || paymentData.status !== "PENDING") return
+
     const pollStatus = async () => {
       setIsPolling(true)
       try {
@@ -92,28 +119,6 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
         const data = await response.json()
 
         setPollCount((prev) => prev + 1)
-
-        // Rescue data if state is empty or missing amount/pix
-        if (data.pixPayload && (!paymentData || !paymentData.pixCopiaECola || !paymentData.amount)) {
-          const qrBase64 = await generateQrCode(data.pixPayload)
-          const newData: PaymentData = {
-            transactionId: data.transactionId || transactionId,
-            pixCopiaECola: data.pixPayload,
-            qrcodeBase64: qrBase64,
-            amount: data.amount,
-            status: data.status,
-            expiresAt: paymentData?.expiresAt || new Date(Date.now() + 3600 * 1000).toISOString(),
-          }
-          setPaymentData(newData)
-
-          // Also save back to storage
-          PaymentStorage.create({
-            ...newData,
-            createdAt: new Date().toISOString(),
-            planId: "detected",
-            amount: data.amount
-          })
-        }
 
         if (data.status === "PAID") {
           setPaymentData((prev) => (prev ? { ...prev, status: "PAID" } : null))
@@ -128,10 +133,9 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
       }
     }
 
-    const interval = setInterval(pollStatus, 3000) // Poll every 3 seconds
-    pollStatus() // Initial call
+    const interval = setInterval(pollStatus, 3000)
     return () => clearInterval(interval)
-  }, [paymentData, transactionId, router])
+  }, [paymentData, transactionId])
 
   // Update countdown timer
   useEffect(() => {

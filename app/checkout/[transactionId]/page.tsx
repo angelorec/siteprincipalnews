@@ -6,6 +6,7 @@ interface CheckoutPageProps {
   }
 }
 
-export default function CheckoutPage({ params }: CheckoutPageProps) {
-  return <CheckoutClient transactionId={params.transactionId} />
+export default async function CheckoutPage({ params }: CheckoutPageProps) {
+  const { transactionId } = await params
+  return <CheckoutClient transactionId={transactionId} />
 }

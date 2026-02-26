@@ -1,6 +1,13 @@
-import QRCode from "qrcode"
+"use client"
 
-// ... (imports remain same)
+import { useEffect, useState } from "react"
+import { motion } from "framer-motion"
+import { Button } from "@/components/ui/button"
+import { Badge } from "@/components/ui/badge"
+import { Copy, CheckCircle, Clock, Smartphone, AlertCircle, RefreshCw, ArrowLeft } from "lucide-react"
+import { useRouter } from "next/navigation"
+import Image from "next/image"
+import QRCode from "qrcode"
 import { PaymentStorage } from "@/lib/payment-storage"
 
 interface PaymentData {

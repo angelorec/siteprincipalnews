@@ -9,12 +9,11 @@ export function HeroSection() {
       {/* Background Image */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="https://i.ibb.co/W4Sq7hCG/Design-sem-nome.png"
+          src="/cover-photo.png"
           alt="Natália Katowicz Cover"
           fill
           className="object-cover"
           priority
-          unoptimized
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background/95 via-background/60 to-background/40" />
       </div>

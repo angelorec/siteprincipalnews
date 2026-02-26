@@ -71,7 +71,12 @@ export function SignupDialog({ isOpen, onClose, selectedPlan, user }: SignupDial
       const data = await response.json()
 
       if (data.success && data.transactionId) {
-        router.push(`/checkout/${data.transactionId}`)
+        // Pass payment data via URL params so checkout page can display it
+        const params = new URLSearchParams({
+          amount: selectedPlan.price.replace(/[^\d,]/g, '').replace(',', '.'),
+          pix: data.pixPayload || "",
+        })
+        router.push(`/checkout/${data.transactionId}?${params.toString()}`)
       } else {
         const errorMsg = data.details ? `${data.error}: ${data.details}` : (data.error || "Erro ao criar pagamento. Tente novamente.")
         setError(errorMsg)

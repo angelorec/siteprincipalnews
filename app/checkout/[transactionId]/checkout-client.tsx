@@ -52,50 +52,48 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
     }
   }
 
-  // Fetch initial payment data
+  // Fetch initial payment data from URL search params (most reliable) or API
   useEffect(() => {
     const fetchPaymentData = async () => {
       try {
-        // Try localStorage first
-        const localTransaction = PaymentStorage.get(transactionId)
+        // Read from URL search params (set by PlanDialog)
+        const urlParams = new URLSearchParams(window.location.search)
+        const urlAmount = urlParams.get("amount")
+        const urlPix = urlParams.get("pix")
+        const urlQr = urlParams.get("qr")
 
-        if (localTransaction && localTransaction.pixCopiaECola) {
+        if (urlPix) {
+          // Generate QR code on the client if not provided via URL
+          let qrCode = urlQr || ""
+          if (!qrCode && urlPix) {
+            qrCode = await generateQrCode(urlPix)
+          }
+
           setPaymentData({
-            transactionId: localTransaction.transactionId,
-            qrcodeImageUrl: localTransaction.qrcodeImageUrl,
-            qrcodeBase64: localTransaction.qrcodeBase64,
-            pixCopiaECola: localTransaction.pixCopiaECola,
-            expiresAt: localTransaction.expiresAt,
-            status: localTransaction.status,
-            planId: localTransaction.planId,
-            amount: localTransaction.amount,
+            transactionId,
+            pixCopiaECola: urlPix,
+            qrcodeBase64: qrCode,
+            amount: urlAmount ? Number(urlAmount) : undefined,
+            status: "PENDING",
+            expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
           })
           setLoading(false)
           return
         }
 
-        // If not in localStorage, rescue from API
-        console.log("[Checkout] Not in localStorage, fetching from API...")
+        // Fallback: try the status API
         const response = await fetch(`/api/lirapay/status/${transactionId}`)
         const data = await response.json()
 
         if (data.pixPayload) {
           const qrBase64 = await generateQrCode(data.pixPayload)
-          const newData: PaymentData = {
+          setPaymentData({
             transactionId: data.transactionId || transactionId,
             pixCopiaECola: data.pixPayload,
             qrcodeBase64: qrBase64,
             amount: data.amount,
             status: data.status || "PENDING",
             expiresAt: new Date(Date.now() + 3600 * 1000).toISOString(),
-          }
-          setPaymentData(newData)
-
-          // Save to localStorage for future use
-          PaymentStorage.create({
-            ...newData,
-            createdAt: new Date().toISOString(),
-            planId: "detected",
           })
         }
       } catch (error) {

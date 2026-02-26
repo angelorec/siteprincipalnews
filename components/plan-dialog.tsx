@@ -60,19 +60,14 @@ export function PlanDialog({ plan, open, onOpenChange }: PlanDialogProps) {
 
       const data = await response.json()
 
-      // Store in local storage to prevent fallback to mock data
-      PaymentStorage.create({
-        transactionId: data.transactionId,
-        planId: plan.id,
-        amount: plan.price,
-        status: "PENDING",
-        pixCopiaECola: data.pixPayload || "",
-        qrcodeBase64: data.qrcodeBase64 || "",
-        expiresAt: new Date(Date.now() + 24 * 3600 * 1000).toISOString(),
-        createdAt: new Date().toISOString(),
+      // Build checkout URL with payment data in query params (bulletproof approach)
+      const params = new URLSearchParams({
+        amount: String(plan.price),
+        pix: data.pixPayload || "",
+        qr: data.qrcodeBase64 || "",
       })
 
-      router.push(`/checkout/${data.transactionId}`)
+      router.push(`/checkout/${data.transactionId}?${params.toString()}`)
     } catch (error) {
       console.error("Erro ao gerar PIX:", error)
       // TODO: Add toast notification

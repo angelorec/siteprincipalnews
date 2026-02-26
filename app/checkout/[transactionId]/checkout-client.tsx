@@ -213,10 +213,10 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
             </div>
 
             <span className={`inline-block px-3 py-1 rounded-full text-sm mb-4 ${paymentData.status === "PAID"
-                ? "bg-green-500/20 text-green-400 border border-green-500/30"
-                : paymentData.status === "EXPIRED"
-                  ? "bg-red-500/20 text-red-400 border border-red-500/30"
-                  : "bg-purple-500/20 text-purple-400 border border-purple-500/30"
+              ? "bg-green-500/20 text-green-400 border border-green-500/30"
+              : paymentData.status === "EXPIRED"
+                ? "bg-red-500/20 text-red-400 border border-red-500/30"
+                : "bg-purple-500/20 text-purple-400 border border-purple-500/30"
               }`}>
               {paymentData.status === "PAID"
                 ? "Pagamento Confirmado!"
@@ -235,7 +235,7 @@ export function CheckoutClient({ transactionId }: CheckoutClientProps) {
 
             {paymentData.amount && (
               <p className="text-2xl font-bold text-purple-400 mb-4">
-                R$ {(paymentData.amount / 100).toFixed(2).replace(".", ",")}
+                R$ {paymentData.amount.toFixed(2).replace(".", ",")}
               </p>
             )}
 

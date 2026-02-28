@@ -81,7 +81,7 @@ export function MobileProfileSection() {
       price: "R$ 39,90",
       originalPrice: "R$ 59,70",
       discount: "33% OFF",
-      popular: true,
+      popular: false,
     },
     {
       id: "semester",
@@ -89,7 +89,7 @@ export function MobileProfileSection() {
       price: "R$ 59,90",
       originalPrice: "R$ 119,40",
       discount: "50% OFF",
-      popular: false,
+      popular: true,
     },
   ]
 
@@ -99,7 +99,7 @@ export function MobileProfileSection() {
     "Sem querer me gabar, mas o melhor conteudo +18 que voce vai ver, e o meu, ta? Ja fui top criadoras no site laranjinha e na azulzinha, e hoje tenho minha propria plataforma."
 
   return (
-    <div className="max-w-md mx-auto bg-black text-white min-h-screen relative overflow-hidden font-sans">
+    <div className="w-full bg-black text-white min-h-screen relative overflow-hidden font-sans">
       {/* Dynamic Background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(255,0,255,0.1)_0%,_black_100%)]" />
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -113,36 +113,38 @@ export function MobileProfileSection() {
         variants={containerVariants}
       >
         {/* Header Section */}
-        <div className="relative">
+        <div className="w-full relative">
           {/* Cover Image with Glass Overlay */}
           <motion.div
-            className="relative h-64 overflow-hidden"
+            className="w-full relative h-72 md:h-96 overflow-hidden"
             variants={itemVariants(-10)}
           >
             <Image
               src="/cover-v2.png"
               alt="Cover"
               fill
-              sizes="(max-width: 768px) 100vw, 800px"
-              className="object-cover scale-105"
+              sizes="100vw"
+              className="object-cover"
               priority
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+            {/* Sombreamento intensificado na parte inferior */}
+            <div className="absolute inset-0 bg-gradient-to-t from-black via-black/60 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-t from-black from-5% via-transparent to-transparent opacity-90" />
           </motion.div>
 
-          {/* Profile Identity - Asymmetric Overlap */}
-          <div className="relative px-6 -mt-16 flex flex-col items-start">
+          {/* Profile Identity - Centered in Max Width */}
+          <div className="max-w-md mx-auto relative px-6 -mt-20 flex flex-col items-start pb-12">
             <motion.div
               className="relative mb-6"
               variants={logoVariants}
             >
-              <div className="w-28 h-28 rounded-sm overflow-hidden border-2 border-white/90 shadow-[0_0_20px_rgba(255,255,255,0.2)]">
+              <div className="w-32 h-32 rounded-sm overflow-hidden border-2 border-white/90 shadow-[0_0_30px_rgba(255,255,255,0.3)]">
                 <Image
                   src="https://i.imgur.com/hTDWL8R.png"
                   alt="Natalia Katowicz"
-                  width={112}
-                  height={112}
-                  sizes="112px"
+                  width={128}
+                  height={128}
+                  sizes="128px"
                   className="object-cover w-full h-full"
                   priority
                 />
@@ -228,29 +230,36 @@ export function MobileProfileSection() {
                   <motion.button
                     key={plan.id}
                     variants={itemVariants(index % 2 === 0 ? -15 : 15)}
-                    whileHover={{ scale: 1.02 }}
+                    whileHover={{ scale: plan.popular ? 1.05 : 1.02 }}
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handlePlanClick(plan.id)}
-                    className="w-full relative group overflow-hidden"
+                    className={`w-full relative group overflow-hidden rounded-2xl transition-all duration-300 ${plan.popular
+                      ? 'border-2 border-primary bg-primary/10 shadow-[0_0_30px_rgba(255,0,255,0.2)] scale-105 my-6 z-10'
+                      : 'bg-white/5 border border-white/10'
+                      }`}
                   >
-                    <div className="absolute inset-0 bg-white/5 border border-white/10 group-hover:border-primary/50 transition-colors" />
+                    {!plan.popular && <div className="absolute inset-0 bg-white/5 border border-white/10 group-hover:border-primary/50 transition-colors" />}
+
                     {plan.popular && (
-                      <div className="absolute top-0 right-0 bg-primary px-3 py-1 text-[10px] font-black uppercase tracking-tighter">
-                        Most Wanted
-                      </div>
+                      <>
+                        <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/5 to-transparent animate-pulse" />
+                        <div className="absolute top-0 right-0 bg-primary px-4 py-1.5 text-[10px] font-black uppercase text-white tracking-widest shadow-lg rounded-bl-lg z-20">
+                          🔥 Recomendado
+                        </div>
+                      </>
                     )}
 
-                    <div className="relative p-5 flex items-center justify-between">
+                    <div className="relative p-6 flex items-center justify-between z-10">
                       <div className="flex flex-col items-start">
-                        <span className="font-playfair text-xl font-bold italic">{plan.name}</span>
+                        <span className={`font-playfair text-2xl font-bold italic ${plan.popular ? 'text-white' : 'text-gray-200'}`}>{plan.name}</span>
                         {plan.discount && (
-                          <span className="text-[10px] text-primary font-bold uppercase tracking-widest">{plan.discount}</span>
+                          <span className={`${plan.popular ? 'bg-primary/20 px-2 py-0.5 mt-1 rounded text-primary border border-primary/30' : 'text-primary mt-1'} text-[10px] font-bold uppercase tracking-widest`}>{plan.discount}</span>
                         )}
                       </div>
                       <div className="flex flex-col items-end">
-                        <span className="text-2xl font-black">{plan.price}</span>
+                        <span className={`text-3xl font-black ${plan.popular ? 'text-transparent bg-clip-text bg-gradient-to-r from-white to-primary/80 drop-shadow-[0_0_10px_rgba(255,255,255,0.5)]' : ''}`}>{plan.price}</span>
                         {plan.originalPrice && (
-                          <span className="text-[10px] text-gray-600 line-through tracking-tighter">{plan.originalPrice}</span>
+                          <span className="text-[11px] text-gray-500 line-through tracking-tighter mt-1">{plan.originalPrice}</span>
                         )}
                       </div>
                     </div>
@@ -272,6 +281,6 @@ export function MobileProfileSection() {
         selectedPlan={selectedPlan ? plans.find((p) => p.id === selectedPlan) ?? null : null}
         user={user}
       />
-    </div>
+    </div >
   )
 }

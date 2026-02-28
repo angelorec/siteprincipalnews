@@ -5,7 +5,12 @@
     "price": 1990,
     "period": "mensal",
     "description": "Acesso mensal a todo conteúdo exclusivo",
-    "features": ["Fotos exclusivas", "Vídeos em HD", "Chat direto", "Atualizações diárias"]
+    "features": [
+      "Fotos exclusivas",
+      "Vídeos em HD",
+      "Chat direto",
+      "Atualizações diárias"
+    ]
   },
   {
     "id": "quarterly",
@@ -26,12 +31,12 @@
   },
   {
     "id": "semester",
-    "title": "Semestral",
+    "title": "Vitalício",
     "price": 5990,
-    "period": "semestral",
+    "period": "vitalício",
     "originalPrice": 11940,
     "discount": "50% OFF",
-    "description": "6 meses com máximo desconto",
+    "description": "Acesso vitalício com máximo desconto",
     "features": [
       "Todo conteúdo Premium",
       "Conteúdo personalizado",

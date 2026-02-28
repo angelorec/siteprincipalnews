@@ -85,7 +85,7 @@ export function MobileProfileSection() {
     },
     {
       id: "semester",
-      name: "6 meses",
+      name: "Vitalício",
       price: "R$ 59,90",
       originalPrice: "R$ 119,40",
       discount: "50% OFF",

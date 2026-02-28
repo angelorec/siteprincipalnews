@@ -99,7 +99,7 @@ export function MobileProfileSection() {
     "Sem querer me gabar, mas o melhor conteudo +18 que voce vai ver, e o meu, ta? Ja fui top criadoras no site laranjinha e na azulzinha, e hoje tenho minha propria plataforma."
 
   return (
-    <div className="w-full bg-black text-white min-h-screen relative overflow-hidden font-sans">
+    <div className="w-full bg-black text-white relative overflow-hidden font-sans">
       {/* Dynamic Background */}
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(255,0,255,0.1)_0%,_black_100%)]" />
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none"
@@ -234,7 +234,7 @@ export function MobileProfileSection() {
                     whileTap={{ scale: 0.98 }}
                     onClick={() => handlePlanClick(plan.id)}
                     className={`w-full relative group overflow-hidden rounded-2xl transition-all duration-300 ${plan.popular
-                      ? 'border-2 border-primary bg-primary/10 shadow-[0_0_30px_rgba(255,0,255,0.2)] scale-105 my-6 z-10'
+                      ? 'border-2 border-primary bg-primary/10 shadow-[0_0_30px_rgba(255,0,255,0.2)] scale-105 z-10'
                       : 'bg-white/5 border border-white/10'
                       }`}
                   >
